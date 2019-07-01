@@ -30,16 +30,19 @@ router.post('/facebook', (req, res) => {
                 email: email,
                 firstName: first_name,
                 lastName: last_name,
-                picture: picture.data.url,
+                photos: picture.data.url,
             });
             //save to db
             newFacebookUser.save((err, savedUser) => {
                 if(err) {
                     console.log('Error while saving facebook user');
                     console.log(err);
-                    return done(null, false);
+                    return res.json({
+                        'errors': {db: `Error while saving the user to database: ${err}`}
+                    });
                 } else {
-                    return done(null, savedUser);
+                    const token = jwt.sign({ id: savedUser._id }, keys.jwtSecret.secret);
+                    return res.json({ token: token });
                 };
             });
         };
