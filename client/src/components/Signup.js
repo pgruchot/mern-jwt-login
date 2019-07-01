@@ -69,25 +69,25 @@ class Signup extends Component {
                                     <div className="row">
                                         <div className="input-field col s12">
                                             <input name="username" type="text" className="validate"  onChange={this.handleChange}/>
-                                            <label for="username">Username</label>
+                                            <label htmlFor="username">Username</label>
                                         </div>
                                     </div>
                                     <div className="row">
                                         <div className="input-field col s12">
                                             <input name="email" type="email" className="validate"  onChange={this.handleChange}/>
-                                            <label for="username">Email</label>
+                                            <label htmlFor="username">Email</label>
                                         </div>
                                     </div>
                                     <div className="row">
-                                        <div class="input-field col s12">
+                                        <div className="input-field col s12">
                                             <input name="password" type="password" className="validate" onChange={this.handleChange}/>
-                                            <label for="password">Password</label>
+                                            <label htmlFor="password">Password</label>
                                         </div>
                                     </div>
                                     <div className="row">
-                                        <div class="input-field col s12">
+                                        <div className="input-field col s12">
                                             <input name="password2" type="password" className="validate" onChange={this.handleChange}/>
-                                            <label for="password2">Repeat Password</label>
+                                            <label htmlFor="password2">Repeat Password</label>
                                         </div>
                                     </div>
                                     <div className="row">

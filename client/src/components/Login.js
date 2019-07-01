@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom'
 import withAuthContext from './withAuthContext';
+import axios from 'axios';
+import FacebookLogin from 'react-facebook-login';
+import config from './config/keys'
 class Login extends Component {
     constructor() {
         super();
@@ -11,8 +14,27 @@ class Login extends Component {
         };
         this.handleChange = this.handleChange.bind(this);
         this.updateErrors = this.updateErrors.bind(this);
+        this.handleOauth = this.handleOauth.bind(this);
 
     };
+
+    handleOauth(response) { 
+        axios
+        .post('/auth/facebook', {
+            data: response
+        })
+        .then(response => {
+            console.log(response)
+            if (response.data.token) {
+               console.log('login component token: '+ response.data.token)
+               localStorage.setItem('JWT', response.data.token);
+                // update the state
+                
+            } else {
+                this.updateErrors(response.data.errors);
+            }
+        })
+    }
 
     updateErrors(errors) {
         this.setState({
@@ -33,7 +55,10 @@ class Login extends Component {
                 return <h2>{this.state.errors[err]}</h2>
             })
             ) : (null);
-        
+            const responseFacebook = (response) => {
+                console.log(response.email);
+                console.log(response.picture.data.url)
+              }
         return(
             <div>
 
@@ -50,13 +75,13 @@ class Login extends Component {
                                             <div className="row center">
                                                 <div className="input-field col s12">
                                                     <input name="username" type="text" className="validate"  onChange={this.handleChange}/>
-                                                    <label for="username">Username</label>
+                                                    <label htmlFor="username">Username</label>
                                                 </div>
                                             </div>
                                             <div className="row">
                                                 <div className="input-field col s12">
                                                     <input name="password" type="password" className="validate" onChange={this.handleChange}/>
-                                                    <label for="password">Password</label>
+                                                    <label htmlFor="password">Password</label>
                                                 </div>
                                             </div>
                                             <div className="row">
@@ -65,7 +90,11 @@ class Login extends Component {
                                                 </button>
                                             </div>
                                             <div className="row">
-                                                <a href="http://localhost:5000/auth/facebook" className="btn purple darken-4">Sign in with facebook</a>
+                                                <FacebookLogin
+                                                    appId={config.facebook.clientID} //APP ID NOT CREATED YET
+                                                    fields="first_name, last_name, email, id, picture"
+                                                    callback={(response) => {this.props.context.loginOauth(response, this.updateErrors)}}
+                                                />
                                             </div>
                                         </form>
                                     </div>

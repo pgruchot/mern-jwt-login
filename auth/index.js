@@ -8,14 +8,44 @@ const validateLoginInput = require('../validation/login');
 const keys = require('../config/keys');
 
 //passport routes for Oauth providers, react href get requests
-router.get('/facebook', passport.authenticate('facebook', { scope: ['public_profile', 'email'], session: false }));
-router.get('/facebook/callback', passport.authenticate('facebook', {
-    failureRedirect: 'http://localhost:3000/login',
-    session: false
-}), (req, res) => {
-    res.redirect("http://localhost:3000/");
-}
-);
+router.post('/facebook', (req, res) => {
+    console.log(req.data);
+    const { id, first_name, last_name, picture, email } = req.body.data;
+    User.findOne({ 'facebook.facebookId' : id }, (err, userMatch) => {
+        //errors
+        if(err) {
+            console.log('Error while looking for facebookId');
+            console.log(err);
+            return res.json({
+                'errors': {db: `Error while saving the user to database: ${err}`}
+            });
+        }
+        //user found
+        if(userMatch) {
+            const token = jwt.sign({ id: userMatch._id }, keys.jwtSecret.secret);
+            return res.json({ token: token });
+        } else {
+            const newFacebookUser = new User({
+                'facebook.facebookId': id,
+                email: email,
+                firstName: first_name,
+                lastName: last_name,
+                picture: picture.data.url,
+            });
+            //save to db
+            newFacebookUser.save((err, savedUser) => {
+                if(err) {
+                    console.log('Error while saving facebook user');
+                    console.log(err);
+                    return done(null, false);
+                } else {
+                    return done(null, savedUser);
+                };
+            });
+        };
+    });
+});
+
 
 //get user data route if authenticated
 router.get('/user', (req, res, next) => {
@@ -61,9 +91,7 @@ router.post('/login', (req, res, next) => {
         // a response."
         // Source: http://passportjs.org/docs
         // ***********************************************************************
-        req.logIn(user, loginErr => {
-            //PASSPORT ALWAYS RETURNS SESSION INIT FAIL ERROR, HANDLE WITH CARE :f
-            User.findOne({ '_id': user._id })
+        User.findOne({ '_id': user._id })
             .then(user => {
                 console.log('hete');
                 const token = jwt.sign({ id: user._id }, keys.jwtSecret.secret);
@@ -71,15 +99,9 @@ router.post('/login', (req, res, next) => {
             }).catch(err => {
                 console.log('error in login findone jwt');
                 return null;
-            })
-        });      
+            })     
     })(req, res, next);
     });
-
-//logout route
-router.post('/logout', (req, res) => {
-    
-});
 
 //passport local signup route
 router.post('/signup', (req, res) => {

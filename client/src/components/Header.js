@@ -6,7 +6,7 @@ const Header = (props) => (
     <div>
           <nav>
             <div className="nav-wrapper purple darken-4">
-              <a href="#" className="brand-logo" style={{paddingLeft: 10 + 'px'}}>MERN with sessions</a>
+              <a href="#" className="brand-logo" style={{paddingLeft: 10 + 'px'}}>MERN with JWT</a>
                 {props.context.isAuth ? (
                   <div>              
                     <ul id="dropdown1" className="dropdown-content">
